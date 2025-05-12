@@ -3,49 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Podcast Audio Converter</title>
+    <title>Real-Time Podcast Converter</title>
     <style>
+        :root {
+            --primary: #3498db;
+            --primary-dark: #2980b9;
+            --success: #2ecc71;
+            --success-dark: #27ae60;
+            --danger: #e74c3c;
+            --danger-dark: #c0392b;
+            --purple: #9b59b6;
+            --purple-dark: #8e44ad;
+            --gray: #95a5a6;
+            --gray-dark: #7f8c8d;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
             background-color: #f5f5f5;
-        }
-        
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
+            padding: 20px;
         }
         
         .container {
+            max-width: 1000px;
+            margin: 0 auto;
             background-color: white;
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: var(--dark);
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
         }
         
         .upload-area {
-            border: 2px dashed #3498db;
-            border-radius: 5px;
+            border: 2px dashed var(--primary);
+            border-radius: 8px;
             padding: 30px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
         
         .upload-area:hover {
-            background-color: #f0f8ff;
-            border-color: #2980b9;
+            background-color: rgba(52, 152, 219, 0.05);
+            border-color: var(--primary-dark);
         }
         
         .upload-area.active {
-            background-color: #e1f0fa;
+            background-color: rgba(26, 188, 156, 0.05);
             border-color: #1abc9c;
+        }
+        
+        .upload-area i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: block;
         }
         
         #fileInput {
@@ -53,227 +84,350 @@
         }
         
         .btn {
-            background-color: #3498db;
+            background-color: var(--primary);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 12px 24px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.3s;
-            margin: 5px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+        }
+        
+        .btn i {
+            margin-right: 8px;
         }
         
         .btn:hover {
-            background-color: #2980b9;
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
         }
         
         .btn:disabled {
-            background-color: #95a5a6;
+            background-color: var(--gray);
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-success:hover {
+            background-color: var(--success-dark);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background-color: var(--danger-dark);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+        }
+        
+        .btn-warning:hover {
+            background-color: var(--warning-dark);
+        }
+        
+        .btn-purple {
+            background-color: var(--purple);
+        }
+        
+        .btn-purple:hover {
+            background-color: var(--purple-dark);
         }
         
         .controls {
-            margin-top: 20px;
             display: flex;
             flex-wrap: wrap;
+            gap: 12px;
             justify-content: center;
-            gap: 10px;
+            margin: 25px 0;
         }
         
         .progress-container {
-            margin-top: 20px;
+            margin: 25px 0;
             display: none;
         }
         
         progress {
             width: 100%;
-            height: 20px;
-            border-radius: 10px;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        progress::-webkit-progress-bar {
+            background-color: #f0f0f0;
+            border-radius: 6px;
+        }
+        
+        progress::-webkit-progress-value {
+            background-color: var(--primary);
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+        
+        progress::-moz-progress-bar {
+            background-color: var(--primary);
+            border-radius: 6px;
         }
         
         .status {
             margin-top: 10px;
             font-style: italic;
-            color: #7f8c8d;
+            color: var(--gray-dark);
             text-align: center;
         }
         
-        .audio-player {
+        .audio-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .audio-box {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .audio-label {
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+            color: var(--dark);
+            font-size: 18px;
+        }
+        
+        audio {
             width: 100%;
-            margin-top: 20px;
-            display: none;
-        }
-        
-        .download-btn {
-            display: none;
-            margin-top: 15px;
-            background-color: #2ecc71;
-        }
-        
-        .download-btn:hover {
-            background-color: #27ae60;
+            margin-top: 10px;
+            border-radius: 6px;
         }
         
         .presets {
-            margin-top: 20px;
+            margin: 25px 0;
             text-align: center;
         }
         
         .preset-btn {
-            margin: 5px;
-            padding: 8px 15px;
-            background-color: #ecf0f1;
+            margin: 6px;
+            padding: 10px 20px;
+            background-color: var(--light);
             border: 1px solid #bdc3c7;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            font-weight: 500;
         }
         
         .preset-btn:hover {
             background-color: #d5dbdb;
+            transform: translateY(-2px);
         }
         
         .preset-btn.active {
-            background-color: #3498db;
+            background-color: var(--primary);
             color: white;
-            border-color: #2980b9;
-        }
-        
-        .comparison {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        
-        .audio-box {
-            width: 48%;
-            padding: 15px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        
-        .audio-label {
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-align: center;
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         
         .advanced-controls {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 5px;
+            margin: 25px 0;
+            padding: 20px;
+            border-radius: 8px;
             background-color: #f0f7ff;
             display: none;
         }
         
-        .toggle-advanced {
-            background-color: #9b59b6;
-            margin-top: 10px;
-        }
-        
-        .toggle-advanced:hover {
-            background-color: #8e44ad;
-        }
-        
         .slider-container {
-            margin: 10px 0;
+            margin: 15px 0;
         }
         
         .slider-label {
             display: flex;
             justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: var(--primary-dark);
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            background: var(--primary-dark);
+        }
+        
+        .file-info {
+            margin-top: 15px;
+            font-size: 14px;
+            color: var(--gray-dark);
+            text-align: center;
+        }
+        
+        .file-info strong {
+            color: var(--dark);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .audio-box {
+                min-width: 100%;
+            }
+        }
+        
+        /* Loading animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>Professional Podcast Audio Converter</h1>
+        <h1><i class="fas fa-podcast"></i> Real-Time Podcast Converter</h1>
         
         <div class="upload-area" id="uploadArea">
+            <i class="fas fa-cloud-upload-alt"></i>
             <p>Drag & drop your audio file here or click to browse</p>
             <p><small>Supported formats: MP3, WAV, OGG, AAC, M4A</small></p>
+            <div class="file-info" id="fileInfo"></div>
             <input type="file" id="fileInput" accept="audio/*">
         </div>
         
         <div class="presets">
             <p>Select a podcast style preset:</p>
-            <button class="preset-btn active" data-preset="standard">Standard Podcast</button>
-            <button class="preset-btn" data-preset="interview">Interview Style</button>
-            <button class="preset-btn" data-preset="narrative">Narrative Storytelling</button>
-            <button class="preset-btn" data-preset="radio">Radio Show</button>
-            <button class="preset-btn" data-preset="voiceover">Voiceover</button>
-        </div>
-        
-        <button id="toggleAdvanced" class="btn toggle-advanced">Show Advanced Controls</button>
-        
-        <div class="advanced-controls" id="advancedControls">
-            <div class="slider-container">
-                <div class="slider-label">
-                    <label for="bassControl">Bass</label>
-                    <span id="bassValue">0 dB</span>
-                </div>
-                <input type="range" id="bassControl" min="-10" max="10" value="0" step="0.5">
-            </div>
-            
-            <div class="slider-container">
-                <div class="slider-label">
-                    <label for="midControl">Midrange</label>
-                    <span id="midValue">0 dB</span>
-                </div>
-                <input type="range" id="midControl" min="-10" max="10" value="0" step="0.5">
-            </div>
-            
-            <div class="slider-container">
-                <div class="slider-label">
-                    <label for="trebleControl">Treble</label>
-                    <span id="trebleValue">0 dB</span>
-                </div>
-                <input type="range" id="trebleControl" min="-10" max="10" value="0" step="0.5">
-            </div>
-            
-            <div class="slider-container">
-                <div class="slider-label">
-                    <label for="compressionControl">Compression</label>
-                    <span id="compressionValue">4:1</span>
-                </div>
-                <input type="range" id="compressionControl" min="1" max="10" value="4" step="0.5">
-            </div>
-            
-            <div class="slider-container">
-                <div class="slider-label">
-                    <label for="reverbControl">Reverb</label>
-                    <span id="reverbValue">5%</span>
-                </div>
-                <input type="range" id="reverbControl" min="0" max="20" value="5" step="1">
-            </div>
+            <button class="preset-btn active" data-preset="standard">
+                <i class="fas fa-microphone-alt"></i> Standard Podcast
+            </button>
+            <button class="preset-btn" data-preset="interview">
+                <i class="fas fa-users"></i> Interview Style
+            </button>
+            <button class="preset-btn" data-preset="narrative">
+                <i class="fas fa-book-open"></i> Narrative Storytelling
+            </button>
+            <button class="preset-btn" data-preset="radio">
+                <i class="fas fa-broadcast-tower"></i> Radio Show
+            </button>
+            <button class="preset-btn" data-preset="voiceover">
+                <i class="fas fa-film"></i> Voiceover
+            </button>
         </div>
         
         <div class="controls">
-            <button id="convertBtn" class="btn" disabled>Convert to Podcast</button>
-            <button id="playOriginalBtn" class="btn" disabled>Play Original</button>
-            <button id="playProcessedBtn" class="btn" disabled>Play Processed</button>
-            <button id="stopBtn" class="btn" disabled>Stop All</button>
+            <button id="convertBtn" class="btn" disabled>
+                <i class="fas fa-magic"></i> Convert to Podcast
+            </button>
+            <button id="playOriginalBtn" class="btn btn-success" disabled>
+                <i class="fas fa-play"></i> Play Original
+            </button>
+            <button id="playProcessedBtn" class="btn btn-success" disabled>
+                <i class="fas fa-play"></i> Play Processed
+            </button>
+            <button id="stopBtn" class="btn btn-danger" disabled>
+                <i class="fas fa-stop"></i> Stop All
+            </button>
         </div>
         
         <div class="progress-container" id="progressContainer">
             <progress id="progressBar" value="0" max="100"></progress>
-            <p class="status" id="statusText">Processing audio...</p>
+            <p class="status" id="statusText">Ready to process audio</p>
         </div>
         
-        <div class="comparison">
+        <div class="audio-container">
             <div class="audio-box">
                 <div class="audio-label">Original Audio</div>
-                <audio id="originalAudio" class="audio-player" controls></audio>
+                <audio id="originalAudio" controls></audio>
             </div>
             <div class="audio-box">
                 <div class="audio-label">Processed Podcast</div>
-                <audio id="processedAudio" class="audio-player" controls></audio>
+                <audio id="processedAudio" controls></audio>
             </div>
         </div>
         
-        <div style="text-align: center;">
-            <button id="downloadBtn" class="btn download-btn">Download Podcast</button>
+        <div style="text-align: center; margin-top: 30px;">
+            <button id="downloadBtn" class="btn btn-success download-btn" disabled>
+                <i class="fas fa-download"></i> Download Podcast
+            </button>
         </div>
     </div>
 
@@ -282,6 +436,7 @@
             // DOM elements
             const uploadArea = document.getElementById('uploadArea');
             const fileInput = document.getElementById('fileInput');
+            const fileInfo = document.getElementById('fileInfo');
             const convertBtn = document.getElementById('convertBtn');
             const playOriginalBtn = document.getElementById('playOriginalBtn');
             const playProcessedBtn = document.getElementById('playProcessedBtn');
@@ -293,69 +448,69 @@
             const processedAudio = document.getElementById('processedAudio');
             const downloadBtn = document.getElementById('downloadBtn');
             const presetButtons = document.querySelectorAll('.preset-btn');
-            const toggleAdvancedBtn = document.getElementById('toggleAdvanced');
-            const advancedControls = document.getElementById('advancedControls');
             
-            // Advanced controls
-            const bassControl = document.getElementById('bassControl');
-            const midControl = document.getElementById('midControl');
-            const trebleControl = document.getElementById('trebleControl');
-            const compressionControl = document.getElementById('compressionControl');
-            const reverbControl = document.getElementById('reverbControl');
-            const bassValue = document.getElementById('bassValue');
-            const midValue = document.getElementById('midValue');
-            const trebleValue = document.getElementById('trebleValue');
-            const compressionValue = document.getElementById('compressionValue');
-            const reverbValue = document.getElementById('reverbValue');
-            
+            // Audio variables
             let audioContext;
             let audioBuffer;
             let processedBlob;
             let selectedPreset = 'standard';
-            let isAdvancedShown = false;
+            let isProcessing = false;
+            let mediaSource;
+            let sourceBuffer;
+            let mediaRecorder;
+            let recordedChunks = [];
             
             // Preset configurations
             const presets = {
                 standard: {
+                    name: "Standard Podcast",
                     eq: {low: 2.0, mid: 1.5, high: 1.2},
                     compression: {threshold: -20, ratio: 4, attack: 0.003, release: 0.25},
                     reverb: {decay: 1.5, wet: 0.05},
                     loudness: 1.5,
-                    normalize: true
+                    normalize: true,
+                    description: "Balanced settings for general podcasting"
                 },
                 interview: {
+                    name: "Interview Style",
                     eq: {low: 1.5, mid: 2.0, high: 1.5},
                     compression: {threshold: -18, ratio: 5, attack: 0.01, release: 0.3},
                     reverb: {decay: 1.2, wet: 0.03},
                     loudness: 1.6,
-                    normalize: true
+                    normalize: true,
+                    description: "Enhanced midrange for clear dialogue"
                 },
                 narrative: {
+                    name: "Narrative Storytelling",
                     eq: {low: 1.0, mid: 1.8, high: 2.0},
                     compression: {threshold: -22, ratio: 3, attack: 0.005, release: 0.2},
                     reverb: {decay: 2.0, wet: 0.08},
                     loudness: 1.8,
-                    normalize: true
+                    normalize: true,
+                    description: "Crisp highs for engaging narration"
                 },
                 radio: {
+                    name: "Radio Show",
                     eq: {low: 2.5, mid: 1.5, high: 2.5},
                     compression: {threshold: -15, ratio: 6, attack: 0.002, release: 0.15},
                     reverb: {decay: 0.8, wet: 0.1},
                     loudness: 2.0,
-                    normalize: true
+                    normalize: true,
+                    description: "High-energy broadcast sound"
                 },
                 voiceover: {
+                    name: "Voiceover",
                     eq: {low: 1.2, mid: 2.2, high: 1.8},
                     compression: {threshold: -24, ratio: 3.5, attack: 0.004, release: 0.18},
                     reverb: {decay: 0.5, wet: 0.02},
                     loudness: 1.7,
-                    normalize: true
+                    normalize: true,
+                    description: "Clear and present voice for videos"
                 }
             };
             
             // Event listeners
             uploadArea.addEventListener('click', () => fileInput.click());
-            
             fileInput.addEventListener('change', handleFileSelect);
             
             uploadArea.addEventListener('dragover', (e) => {
@@ -377,149 +532,103 @@
             });
             
             convertBtn.addEventListener('click', processAudio);
-            
-            playOriginalBtn.addEventListener('click', () => {
-                stopAllAudio();
-                if (fileInput.files && fileInput.files[0]) {
-                    originalAudio.src = URL.createObjectURL(fileInput.files[0]);
-                    originalAudio.style.display = 'block';
-                    originalAudio.play().catch(e => console.error("Playback failed:", e));
-                }
-            });
-            
-            playProcessedBtn.addEventListener('click', () => {
-                stopAllAudio();
-                if (processedBlob) {
-                    processedAudio.src = URL.createObjectURL(processedBlob);
-                    processedAudio.style.display = 'block';
-                    processedAudio.play().catch(e => console.error("Playback failed:", e));
-                }
-            });
-            
+            playOriginalBtn.addEventListener('click', playOriginal);
+            playProcessedBtn.addEventListener('click', playProcessed);
             stopBtn.addEventListener('click', stopAllAudio);
-            
-            downloadBtn.addEventListener('click', () => {
-                if (processedBlob) {
-                    const url = URL.createObjectURL(processedBlob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'podcast_' + fileInput.files[0].name.replace(/\.[^/.]+$/, '') + '.wav';
-                    document.body.appendChild(a);
-                    a.click();
-                    setTimeout(() => {
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                    }, 100);
-                }
-            });
+            downloadBtn.addEventListener('click', downloadProcessed);
             
             presetButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    presetButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    selectedPreset = btn.dataset.preset;
-                    updateAdvancedControlsFromPreset();
-                });
+                btn.addEventListener('click', selectPreset);
             });
             
-            toggleAdvancedBtn.addEventListener('click', () => {
-                isAdvancedShown = !isAdvancedShown;
-                advancedControls.style.display = isAdvancedShown ? 'block' : 'none';
-                toggleAdvancedBtn.textContent = isAdvancedShown ? 'Hide Advanced Controls' : 'Show Advanced Controls';
-            });
+            // Initialize UI
+            updateStatus('Ready to process audio');
             
-            // Advanced controls event listeners
-            bassControl.addEventListener('input', () => {
-                bassValue.textContent = `${bassControl.value} dB`;
-            });
-            
-            midControl.addEventListener('input', () => {
-                midValue.textContent = `${midControl.value} dB`;
-            });
-            
-            trebleControl.addEventListener('input', () => {
-                trebleValue.textContent = `${trebleControl.value} dB`;
-            });
-            
-            compressionControl.addEventListener('input', () => {
-                compressionValue.textContent = `${compressionControl.value}:1`;
-            });
-            
-            reverbControl.addEventListener('input', () => {
-                reverbValue.textContent = `${reverbControl.value}%`;
-            });
-            
-            // Functions
+            // Main functions
             function handleFileSelect() {
                 if (fileInput.files && fileInput.files[0]) {
                     const file = fileInput.files[0];
                     
-                    // Check if file is audio
+                    // Validate file type
                     if (!file.type.match('audio.*') && !file.name.match(/\.(mp3|wav|ogg|aac|m4a)$/i)) {
-                        alert('Please select an audio file (MP3, WAV, OGG, AAC, M4A)');
+                        showError('Please select an audio file (MP3, WAV, OGG, AAC, M4A)');
                         return;
                     }
                     
                     // Initialize audio context on user interaction
                     if (!audioContext) {
-                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        try {
+                            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        } catch (e) {
+                            showError('Web Audio API is not supported in your browser');
+                            return;
+                        }
                     }
                     
-                    // Display file name
-                    uploadArea.innerHTML = `<p>Selected file: <strong>${file.name}</strong></p><p><small>Click to change</small></p>`;
+                    // Display file info
+                    fileInfo.innerHTML = `
+                        <p>Selected: <strong>${file.name}</strong></p>
+                        <p>Size: <strong>${formatFileSize(file.size)}</strong></p>
+                    `;
                     
                     // Enable buttons
                     convertBtn.disabled = false;
                     playOriginalBtn.disabled = false;
                     stopBtn.disabled = false;
                     
-                    // Hide processed audio controls until conversion
+                    // Reset processed audio
                     playProcessedBtn.disabled = true;
-                    downloadBtn.style.display = 'none';
+                    downloadBtn.disabled = true;
+                    processedAudio.src = '';
                     
                     // Read the file
                     const reader = new FileReader();
                     reader.onload = function(e) {
+                        updateStatus('Decoding audio file...');
+                        
                         audioContext.decodeAudioData(e.target.result)
                             .then(buffer => {
                                 audioBuffer = buffer;
-                                // Ensure we have at least one channel
-                                if (buffer.numberOfChannels === 0) {
-                                    throw new Error("Audio file has no channels");
-                                }
+                                updateStatus('Ready to process audio');
+                                
+                                // Create preview of original audio
+                                originalAudio.src = URL.createObjectURL(file);
+                                originalAudio.load();
                             })
                             .catch(err => {
                                 console.error('Error decoding audio data', err);
-                                alert('Error processing audio file. Please try another file.');
+                                showError('Error processing audio file. Please try another file.');
                                 resetUI();
                             });
                     };
+                    
                     reader.onerror = () => {
-                        alert('Error reading file. Please try another file.');
+                        showError('Error reading file. Please try another file.');
                         resetUI();
                     };
+                    
                     reader.readAsArrayBuffer(file);
                 }
             }
             
             async function processAudio() {
-                if (!audioBuffer) return;
+                if (!audioBuffer || isProcessing) return;
+                
+                isProcessing = true;
+                convertBtn.disabled = true;
+                convertBtn.innerHTML = '<span class="spinner"></span> Processing...';
                 
                 // Show progress
                 progressContainer.style.display = 'block';
-                progressBar.value = 10;
-                statusText.textContent = 'Processing audio...';
-                
-                // Disable buttons during processing
-                convertBtn.disabled = true;
-                playOriginalBtn.disabled = true;
+                updateProgress(10, 'Preparing audio processing...');
                 
                 try {
-                    // Offline audio context for processing
+                    // Get sample rate and channels
                     const sampleRate = audioBuffer.sampleRate;
-                    const numberOfChannels = Math.min(2, audioBuffer.numberOfChannels); // Use up to 2 channels
+                    const numberOfChannels = Math.min(2, audioBuffer.numberOfChannels);
                     const length = audioBuffer.length;
                     
+                    // Create offline context
                     const offlineContext = new OfflineAudioContext(
                         numberOfChannels,
                         length,
@@ -545,31 +654,8 @@
                     
                     source.buffer = newBuffer;
                     
-                    // Get selected preset or use advanced controls
-                    let settings;
-                    if (isAdvancedShown) {
-                        settings = {
-                            eq: {
-                                low: parseFloat(bassControl.value),
-                                mid: parseFloat(midControl.value),
-                                high: parseFloat(trebleControl.value)
-                            },
-                            compression: {
-                                threshold: -20,
-                                ratio: parseFloat(compressionControl.value),
-                                attack: 0.003,
-                                release: 0.25
-                            },
-                            reverb: {
-                                decay: 1.5,
-                                wet: parseFloat(reverbControl.value) / 100
-                            },
-                            loudness: 1.5,
-                            normalize: true
-                        };
-                    } else {
-                        settings = presets[selectedPreset];
-                    }
+                    // Get processing settings for selected preset
+                    const settings = presets[selectedPreset];
                     
                     // Create effects chain
                     const splitter = offlineContext.createChannelSplitter(numberOfChannels);
@@ -597,12 +683,10 @@
                     
                     // Start rendering
                     source.start();
-                    progressBar.value = 30;
-                    statusText.textContent = 'Applying effects...';
+                    updateProgress(30, 'Applying audio effects...');
                     
                     const renderedBuffer = await offlineContext.startRendering();
-                    progressBar.value = 70;
-                    statusText.textContent = 'Finalizing podcast audio...';
+                    updateProgress(70, 'Finalizing podcast audio...');
                     
                     // Normalize audio if enabled
                     if (settings.normalize) {
@@ -612,26 +696,26 @@
                     // Convert to WAV blob
                     processedBlob = bufferToWav(renderedBuffer);
                     
-                    // Create audio URL
+                    // Create audio URL for playback
                     const audioUrl = URL.createObjectURL(processedBlob);
-                    
-                    // Display processed audio
                     processedAudio.src = audioUrl;
-                    processedAudio.style.display = 'block';
-                    downloadBtn.style.display = 'block';
-                    playProcessedBtn.disabled = false;
+                    processedAudio.load();
                     
-                    progressBar.value = 100;
-                    statusText.textContent = 'Processing complete!';
+                    // Enable playback and download
+                    playProcessedBtn.disabled = false;
+                    downloadBtn.disabled = false;
+                    
+                    updateProgress(100, 'Processing complete!');
+                    updateStatus(`Processed as ${presets[selectedPreset].name}`);
                     
                 } catch (error) {
                     console.error('Error processing audio:', error);
-                    statusText.textContent = 'Error processing audio. Please try again.';
-                    progressBar.value = 0;
-                    
-                    // Re-enable buttons
+                    showError('Error processing audio. Please try again.');
+                    updateProgress(0, 'Error occurred');
+                } finally {
+                    isProcessing = false;
                     convertBtn.disabled = false;
-                    playOriginalBtn.disabled = false;
+                    convertBtn.innerHTML = '<i class="fas fa-magic"></i> Convert to Podcast';
                 }
             }
             
@@ -775,9 +859,18 @@
                 return new Blob([view], { type: 'audio/wav' });
             }
             
-            function writeString(view, offset, string) {
-                for (let i = 0; i < string.length; i++) {
-                    view.setUint8(offset + i, string.charCodeAt(i));
+            // Audio playback functions
+            function playOriginal() {
+                stopAllAudio();
+                if (fileInput.files && fileInput.files[0]) {
+                    originalAudio.play().catch(e => console.error("Playback failed:", e));
+                }
+            }
+            
+            function playProcessed() {
+                stopAllAudio();
+                if (processedBlob) {
+                    processedAudio.play().catch(e => console.error("Playback failed:", e));
                 }
             }
             
@@ -786,38 +879,89 @@
                 originalAudio.currentTime = 0;
                 processedAudio.pause();
                 processedAudio.currentTime = 0;
+            }
+            
+            function downloadProcessed() {
+                if (processedBlob) {
+                    const url = URL.createObjectURL(processedBlob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `podcast_${selectedPreset}_${fileInput.files[0].name.replace(/\.[^/.]+$/, '')}.wav`;
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }, 100);
+                }
+            }
+            
+            // Preset functions
+            function selectPreset(e) {
+                const btn = e.currentTarget;
+                selectedPreset = btn.dataset.preset;
                 
-                // If using Web Audio API directly, we'd stop those sources here
+                // Update UI
+                presetButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Show preset description
+                updateStatus(`Selected: ${presets[selectedPreset].name} - ${presets[selectedPreset].description}`);
+                
+                // If we already have processed audio, reprocess with new preset
+                if (audioBuffer) {
+                    processAudio();
+                }
+            }
+            
+            // UI helper functions
+            function updateProgress(value, text) {
+                progressBar.value = value;
+                statusText.textContent = text;
+            }
+            
+            function updateStatus(text) {
+                statusText.textContent = text;
+            }
+            
+            function showError(message) {
+                statusText.textContent = message;
+                statusText.style.color = 'var(--danger)';
+                setTimeout(() => {
+                    statusText.style.color = 'var(--gray-dark)';
+                }, 3000);
             }
             
             function resetUI() {
-                uploadArea.innerHTML = `<p>Drag & drop your audio file here or click to browse</p><p><small>Supported formats: MP3, WAV, OGG, AAC</small></p>`;
+                uploadArea.innerHTML = `
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Drag & drop your audio file here or click to browse</p>
+                    <p><small>Supported formats: MP3, WAV, OGG, AAC, M4A</small></p>
+                `;
+                fileInfo.innerHTML = '';
                 convertBtn.disabled = true;
                 playOriginalBtn.disabled = true;
                 playProcessedBtn.disabled = true;
                 stopBtn.disabled = true;
-                downloadBtn.style.display = 'none';
+                downloadBtn.disabled = true;
                 progressContainer.style.display = 'none';
-                originalAudio.style.display = 'none';
-                processedAudio.style.display = 'none';
+                originalAudio.src = '';
+                processedAudio.src = '';
+                updateStatus('Ready to process audio');
             }
             
-            function updateAdvancedControlsFromPreset() {
-                if (!isAdvancedShown) return;
-                
-                const preset = presets[selectedPreset];
-                bassControl.value = preset.eq.low;
-                midControl.value = preset.eq.mid;
-                trebleControl.value = preset.eq.high;
-                compressionControl.value = preset.compression.ratio;
-                reverbControl.value = preset.reverb.wet * 100;
-                
-                // Update displayed values
-                bassValue.textContent = `${bassControl.value} dB`;
-                midValue.textContent = `${midControl.value} dB`;
-                trebleValue.textContent = `${trebleControl.value} dB`;
-                compressionValue.textContent = `${compressionControl.value}:1`;
-                reverbValue.textContent = `${reverbControl.value}%`;
+            function writeString(view, offset, string) {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            }
+            
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
             }
         });
     </script>
